@@ -409,7 +409,8 @@ async function push(){
   ETAG=r.headers.get('ETag')||'';SYNC={state:'ok',msg:'업로드 완료',at:Date.now()};CFG.last=Date.now();saveCfg();return true
 }
 async function createGist(){const content=await encode(payload(),CFG.pass);const r=await fetch(API,{method:'POST',headers:ghHeaders(true),body:JSON.stringify({description:'iPhone archive (private)',public:false,files:{'archive.json':{content}}})});if(r.status===401||r.status===403)throw {code:'BADTOKEN'};if(!r.ok)throw {code:'HTTP'+r.status};const j=await r.json();return j.id}
-function shareLink(){const base=location.href.split('#')[0];return base+'#g='+CFG.gist}
+const SITE='https://gochigi.github.io/iphone/';
+function shareLink(){const base=location.protocol==='file:'?SITE:location.href.split('#')[0];return base+'#g='+CFG.gist}
 let syncing=false;
 async function syncUp(afterMsg){ /* 변경 후: 최신 받아 합치고 올리기 */
   if(!shared()){persist();if(afterMsg)toast(afterMsg);return}
@@ -626,7 +627,7 @@ $('#st-back').onclick=()=>openTalk(tkTab);
 function openShare(){$('#sheet-bg').classList.add('on');const link=shared()?shareLink():'';const isFile=location.protocol==='file:';
   $('#sheet-in').innerHTML=`<h3>공유 링크</h3><div class="body">
   ${shared()?`<div class="rep">상태: ${SYNC.state==='ok'?'연결됨':esc(SYNC.msg||'확인 전')} · ${canWrite()?'이 기기는 올리기 가능':'이 기기는 읽기 전용'}${CFG.pass?' · 암호화 켜짐':' · 암호 없음'}</div>
-    <div class="sect" style="padding-left:0">읽는 사람에게 보낼 링크</div><div class="code" id="sh-link">${esc(link)}</div>${isFile?'<p class="note" style="margin:6px 0">지금은 PC 파일로 열려 있어서 이 링크는 다른 사람에게 안 통해요. index.html을 GitHub Pages에 올린 뒤 그 주소로 열면 공유 가능한 링크가 돼요.</p>':''}
+    <div class="sect" style="padding-left:0">읽는 사람에게 보낼 링크</div><div class="code" id="sh-link">${esc(link)}</div>${isFile?'<p class="note" style="margin:6px 0">PC 파일로 열려 있지만 링크는 인터넷 주소로 만들어 드렸어요. 이 주소를 폰에서 열고 토큰·암호를 한 번 더 넣으면 폰에서도 올릴 수 있어요.</p>':''}
     <button class="btn" id="sh-copy">링크 복사</button>
     ${CFG.pass?'<p class="note" style="margin:8px 0">암호는 링크에 들어 있지 않아요. 읽는 사람에게 따로 알려 주세요.</p>':''}
     <div class="sect" style="padding-left:0">이 기기 설정</div>
