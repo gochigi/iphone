@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko" data-build="20261108032159">
+<html lang="ko" data-build="20261108032246">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
@@ -751,7 +751,10 @@ const NOTES=[
 <h2>화면 이동</h2><ul><li>어느 화면에서든 <b>맨 아래 막대</b>를 누르면 홈으로 돌아와요.</li><li>이 설명은 홈의 <b>메모</b> 앱에 있어요.</li></ul>
 <h2>처음 열었을 때</h2><p>"아카이브 암호"를 물으면 링크를 보낸 사람에게 받은 암호를 숫자 패드로 넣고 <b>확인</b>. 글자 암호면 왼쪽 아래 <b>문자 암호</b>. 한 번 맞추면 기억돼요.</p>
 <h2>새 글</h2><p>상대가 올린 글은 2분 안에 자동으로 와요. 바로 확인하려면 카카오톡 → 더보기 → <b>지금 새로 받기</b>.</p>
-<h2>홈 화면에 추가</h2><p>Safari 공유 버튼 → <b>홈 화면에 추가</b>를 하면 앱처럼 열려요. 새 버전은 앱을 앞으로 가져올 때 자동으로 적용돼요.</p>`}
+<h2>홈 화면에 추가</h2><p>앱처럼 쓰려면 한 번만 해 두세요.</p>`},
+ {t:'📲 홈 화면에 앱으로 추가하기',d:'2025-11-08',h:`<h2>아이폰 (Safari)</h2><ol><li>받은 링크를 <b>Safari</b>에서 열어요. 카톡 안에서 열렸다면 오른쪽 아래 <b>···</b> → <b>Safari로 열기</b>.</li><li>화면 아래 가운데 <b>공유 버튼</b>(네모에서 화살표가 위로 나가는 모양)을 눌러요.</li><li>목록을 아래로 내려 <b>홈 화면에 추가</b>를 눌러요.</li><li>이름은 마음대로 바꾸고 오른쪽 위 <b>추가</b>.</li><li>홈 화면에 생긴 아이콘으로 열면 주소창 없이 전체 화면으로 떠요.</li></ol>
+<h2>안드로이드 (Chrome)</h2><ol><li>링크를 <b>Chrome</b>에서 열어요.</li><li>오른쪽 위 <b>⋮</b> → <b>홈 화면에 추가</b> → <b>추가</b>.</li></ol>
+<h2>알아두기</h2><ul><li>아이콘으로 열어도 같은 링크라서 암호·하트·설정이 그대로예요.</li><li>새 글은 앱을 앞으로 가져올 때 자동으로 받아요. 새 버전도 알아서 적용돼요.</li><li>아이콘 그림이 바뀌었다면, 기존 아이콘을 길게 눌러 지우고 다시 추가해야 새 그림이 나와요.</li></ul>`}
 ];
 function fmtNoteDate(d){const [y,m,dd]=d.split('-').map(Number);return `${y}년 ${m}월 ${dd}일`}
 function openNotes(){show('notes');$('#nt-list').innerHTML=`<div class="nt-title">메모</div><div class="nt-search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8e8e93" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>검색</div>
