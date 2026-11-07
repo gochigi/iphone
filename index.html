@@ -320,7 +320,7 @@ html.m .hw,html.m #hint,html.m #island{display:none}
 /* ============ 0. 원본 보존 / 상태 ============ */
 const SRC='<!doctype html>\n'+document.documentElement.outerHTML;
 const LS_KEY='kakao_archive_v1', CFG_KEY='kakao_archive_cfg';
-const DEF={v:2,me:'',minLen:200,pass:'',showRoom:true,updated:0,msgs:[]};
+const DEF={v:2,me:'',minLen:200,pass:'',showRoom:true,updated:0,msgs:[],del:{}};
 let FILE_DATA=DEF,DATA_ERR=null; try{FILE_DATA=Object.assign({},DEF,JSON.parse(document.getElementById('archive-data').textContent))}catch(e){DATA_ERR=e}
 let S=FILE_DATA;
 try{const ls=JSON.parse(localStorage.getItem(LS_KEY)||'null'); if(ls&&ls.updated>FILE_DATA.updated) S=Object.assign({},DEF,ls)}catch(e){}
@@ -334,7 +334,8 @@ function unsaved(){return !shared()&&S.updated>FILE_DATA.updated}
 function hash(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return (h>>>0).toString(36)}
 function msgId(m){return hash(m.d+'|'+m.t+'|'+m.x)}
 function sortMsgs(){S.msgs.sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t))}
-function mergeMsgs(list){const have=new Set(S.msgs.map(msgId));let add=0;(list||[]).forEach(m=>{if(!m||!m.x||!m.d)return;const o={d:m.d,t:m.t||'00:00',x:m.x,r:m.r||''};const id=msgId(o);if(!have.has(id)){have.add(id);S.msgs.push(o);add++}});sortMsgs();return add}
+function mergeMsgs(list,revive){if(!S.del)S.del={};const have=new Set(S.msgs.map(msgId));let add=0;(list||[]).forEach(m=>{if(!m||!m.x||!m.d)return;const o={d:m.d,t:m.t||'00:00',x:m.x,r:m.r||''};const id=msgId(o);if(S.del[id]){if(revive)delete S.del[id];else return}if(!have.has(id)){have.add(id);S.msgs.push(o);add++}});sortMsgs();return add}
+function removeMsgs(list){if(!S.del)S.del={};const ids=new Set(list.map(msgId));ids.forEach(id=>S.del[id]=Date.now());S.msgs=S.msgs.filter(m=>!ids.has(msgId(m)))}
 
 /* ============ 1. 카카오톡 내보내기 파서 ============ */
 const KO_MON={};['January','February','March','April','May','June','July','August','September','October','November','December'].forEach((m,i)=>KO_MON[m]=i+1);
@@ -386,7 +387,7 @@ async function encode(obj,pass){const json=JSON.stringify(obj);if(!pass)return j
 async function decode(content,pass){content=content.trim();if(!content.startsWith('ENC1:'))return JSON.parse(content);if(!pass)throw {code:'NEEDPASS'};const [,s,i,c]=content.split(':');try{const key=await deriveKey(pass,unb64(s));const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(i)},key,unb64(c));return JSON.parse(td.decode(pt))}catch(e){throw {code:'BADPASS'}}}
 const API='https://api.github.com/gists';let ETAG='',SYNC={state:'idle',msg:'',at:0};
 function ghHeaders(json){const h={'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};if(CFG.token)h['Authorization']='Bearer '+CFG.token;if(json)h['Content-Type']='application/json';return h}
-function payload(){sortMsgs();return {v:2,me:S.me,minLen:S.minLen,pass:S.pass,showRoom:S.showRoom,updated:S.updated,msgs:S.msgs}}
+function payload(){sortMsgs();return {v:2,me:S.me,minLen:S.minLen,pass:S.pass,showRoom:S.showRoom,updated:S.updated,msgs:S.msgs,del:S.del||{}}}
 async function pull(force){
   if(!shared())return {st:'local'};
   const h=ghHeaders();if(ETAG&&!force)h['If-None-Match']=ETAG;let r;
@@ -398,7 +399,7 @@ async function pull(force){
   ETAG=r.headers.get('ETag')||'';const j=await r.json();const f=j.files&&j.files['archive.json'];if(!f){SYNC={state:'err',msg:'archive.json 없음',at:Date.now()};return {st:'nofile'}}
   let content=f.content;if(f.truncated){content=await (await fetch(f.raw_url,{cache:'no-store'})).text()}
   let data;try{data=await decode(content,CFG.pass)}catch(e){SYNC={state:'locked',msg:e.code==='BADPASS'?'암호가 틀렸어요':'암호가 필요해요',at:Date.now()};return {st:e.code||'badpass'}}
-  const add=mergeMsgs(data.msgs);if(data.me)S.me=data.me;if(data.pass!==undefined)S.pass=data.pass;if(data.minLen)S.minLen=data.minLen;if(data.showRoom!==undefined)S.showRoom=data.showRoom;S.updated=Math.max(S.updated||0,data.updated||0);
+  if(!S.del)S.del={};if(data.del){for(const id in data.del){if(!S.del[id]||data.del[id]>S.del[id])S.del[id]=data.del[id]}}S.msgs=S.msgs.filter(m=>!S.del[msgId(m)]);const add=mergeMsgs(data.msgs);if(data.me)S.me=data.me;if(data.pass!==undefined)S.pass=data.pass;if(data.minLen)S.minLen=data.minLen;if(data.showRoom!==undefined)S.showRoom=data.showRoom;S.updated=Math.max(S.updated||0,data.updated||0);
   persistLocal();SYNC={state:'ok',msg:'최신 상태',at:Date.now()};CFG.last=Date.now();saveCfg();return {st:'ok',add}
 }
 async function push(){
@@ -575,7 +576,7 @@ function renderInbar(){const w=$('#inbar-wrap');if(!canWrite()){w.innerHTML=`<di
 async function sendText(text){text=(text||'').trim();if(!text)return;
   const v=await alertBox({title:'장문 보관',msg:`${text.length.toLocaleString()}자를 보관할게요.\n원래 보낸 날짜와 시각을 적어 주세요.`,input:{type:'date',value:nowYmd()},input2:{type:'time',value:nowHm()},buttons:[{label:'취소'},{label:'보관',bold:true,value:'ok'}]});
   if(!v||v.btn!=='ok')return;const d=v.input||nowYmd(),t=(v.input2||nowHm()).slice(0,5);
-  const add=mergeMsgs([{d,t,x:text,r:''}]);if(!add){toast('이미 똑같은 글이 있어요');return}
+  const add=mergeMsgs([{d,t,x:text,r:''}],true);if(!add){toast('이미 똑같은 글이 있어요');return}
   const ta=$('#ib-text');if(ta){ta.value='';ta.style.height='auto';$('#ib-send').disabled=true}
   renderMsgs();requestAnimationFrame(()=>{const sc=$('#rm-scroll');sc.scrollTop=sc.scrollHeight});
   await syncUp(shared()?'올렸어요 · 상대 화면에도 곧 나타나요':'보관했어요')}
@@ -593,7 +594,7 @@ async function bubbleMenu(b){const m=S.msgs.find(x=>msgId(x)===b.dataset.id);if(
   const btns=[{label:'복사',value:'copy'}];if(canWrite())btns.push({label:'삭제',value:'del',red:true});btns.push({label:'닫기'});
   const v=await alertBox({title:fmtDate(m.d)+' '+fmtTime(m.t),msg:m.x.slice(0,80)+(m.x.length>80?'…':''),buttons:btns});
   if(v.btn==='copy'){(navigator.clipboard?navigator.clipboard.writeText(m.x):Promise.reject()).then(()=>toast('복사했어요'),()=>toast('이 환경에서는 복사가 안 돼요'))}
-  else if(v.btn==='del'){S.msgs=S.msgs.filter(x=>x!==m);renderMsgs();await syncUp('삭제했어요')}}
+  else if(v.btn==='del'){removeMsgs([m]);renderMsgs();await syncUp('삭제했어요')}}
 
 /* ============ 9. 설정 ============ */
 function openSettings(){show('settings');const b=$('#st-body');
@@ -620,7 +621,7 @@ function openSettings(){show('settings');const b=$('#st-body');
   $('#s-pass').onchange=e=>{const v=e.target.value.replace(/\D/g,'');if(v&&(v.length<4||v.length>6)){toast('숫자 4~6자리');e.target.value=S.pass;return}S.pass=v;e.target.value=v;syncUp(v?'잠금 암호 설정':'잠금 암호 해제')};
   $('#s-lock').onclick=relock;$('#s-share').onclick=openShare;$('#s-json').onclick=saveJson;
   if($('#s-save'))$('#s-save').onclick=saveHtml;if($('#s-restore'))$('#s-restore').onclick=()=>$('#jsonfile').click();
-  if($('#s-clear'))$('#s-clear').onclick=async()=>{const v=await alertBox({title:'전체 삭제',msg:'보관한 장문을 모두 지울까요?\n공유 중이면 상대 화면에서도 사라져요.',buttons:[{label:'취소'},{label:'삭제',red:true,value:'ok'}]});if(v.btn==='ok'){S.msgs=[];await syncUp('삭제했어요');openSettings()}}}
+  if($('#s-clear'))$('#s-clear').onclick=async()=>{const v=await alertBox({title:'전체 삭제',msg:'보관한 장문을 모두 지울까요?\n공유 중이면 상대 화면에서도 사라져요.',buttons:[{label:'취소'},{label:'삭제',red:true,value:'ok'}]});if(v.btn==='ok'){removeMsgs(S.msgs.slice());await syncUp('삭제했어요');openSettings()}}}
 $('#st-back').onclick=()=>openTalk(tkTab);
 
 /* ============ 10. 공유 링크 설정 ============ */
@@ -663,7 +664,7 @@ async function saveHtml(){const html=buildHtml();const done=()=>{FILE_DATA=JSON.
   if(window.showSaveFilePicker){try{const h=await showSaveFilePicker({suggestedName:'index.html',types:[{description:'HTML',accept:{'text/html':['.html']}}]});const w=await h.createWritable();await w.write(html);await w.close();done();toast('저장했어요');return}catch(e){if(e&&e.name==='AbortError')return}}
   download('index.html',new Blob([html],{type:'text/html'}));done();toast('내려받은 파일로 기존 파일을 덮어쓰세요')}
 function saveJson(){download(`kakao_archive_${nowYmd()}.json`,new Blob([JSON.stringify({me:S.me,msgs:S.msgs},null,1)],{type:'application/json'}));toast('JSON 백업 내려받음')}
-$('#jsonfile').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(async t=>{const j=JSON.parse(t);const add=mergeMsgs(j.msgs||[]);if(!S.me&&j.me)S.me=j.me;await syncUp(`${add}개 복원`);openSettings()}).catch(()=>toast('JSON 파일을 읽지 못했어요'));e.target.value=''};
+$('#jsonfile').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(async t=>{const j=JSON.parse(t);const add=mergeMsgs(j.msgs||[],true);if(!S.me&&j.me)S.me=j.me;await syncUp(`${add}개 복원`);openSettings()}).catch(()=>toast('JSON 파일을 읽지 못했어요'));e.target.value=''};
 
 /* ============ 12. 대화 파일 가져오기 ============ */
 let IMP=null;
@@ -689,7 +690,7 @@ function renderPick(){const names=Object.keys(IMP.senders).sort((a,b)=>IMP.sende
   const preview=()=>{const who=(document.querySelector('input[name=who]:checked')||{}).value;const min=Math.max(1,+$('#imp-min').value||1);$('#imp-preview').textContent=`${candidates(who,min).length.toLocaleString()}개 선택됨`};
   document.querySelectorAll('input[name=who]').forEach(r=>r.onchange=preview);$('#imp-min').oninput=preview;preview();$('#imp-back').onclick=openImport;
   $('#imp-go').onclick=async()=>{const who=(document.querySelector('input[name=who]:checked')||{}).value;if(!who)return;const min=Math.max(1,+$('#imp-min').value||1);const cand=candidates(who,min);
-    if(!S.me)S.me=who;S.minLen=min;const add=mergeMsgs(cand);closeSheet();banner('카카오톡',`장문 ${add.toLocaleString()}개를 새로 보관했어요 (중복 ${(cand.length-add).toLocaleString()}개 제외)`);
+    if(!S.me)S.me=who;S.minLen=min;const add=mergeMsgs(cand,true);closeSheet();banner('카카오톡',`장문 ${add.toLocaleString()}개를 새로 보관했어요 (중복 ${(cand.length-add).toLocaleString()}개 제외)`);
     if($('#room').classList.contains('on'))openRoom();else openTalk('chats');
     await syncUp();if(!shared()&&add)setTimeout(async()=>{const v=await alertBox({title:'파일로 저장',msg:'지금 파일로 저장할까요? 저장해야 다른 곳에서 열어도 보여요.',buttons:[{label:'나중에'},{label:'저장',bold:true,value:'ok'}]});if(v.btn==='ok')saveHtml()},800)}}
 
@@ -720,6 +721,7 @@ if(location.hash==='#selftest'){(async()=>{
   let code='';try{await decode(enc,'wrong')}catch(e){code=e.code}ok('decode badpass',code==='BADPASS');
   code='';try{await decode(enc,'')}catch(e){code=e.code}ok('decode needpass',code==='NEEDPASS');
   ok('shareLink',shareLink().includes('#g='));
+  S.msgs=[];S.del={};mergeMsgs([{d:'2024-01-01',t:'10:00',x:'z1'},{d:'2024-01-02',t:'10:00',x:'z2'}]);removeMsgs([S.msgs[0]]);const back=mergeMsgs([{d:'2024-01-01',t:'10:00',x:'z1'}]);ok('tombstone blocks remerge',back===0&&S.msgs.length===1&&Object.keys(S.del).length===1);const rev=mergeMsgs([{d:'2024-01-01',t:'10:00',x:'z1'}],true);ok('revive on manual add',rev===1&&S.msgs.length===2&&Object.keys(S.del).length===0);ok('payload has del','del' in payload());S.del={};
   S.msgs=[];$('#selftest').textContent=T.join('\n');$('#selftest').style.display='block';document.title='SELFTEST '+(T.every(t=>t.startsWith('PASS'))?'ALL PASS':'FAIL')})()}
 </script>
 </body>
