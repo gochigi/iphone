@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko" data-build="20261108030058">
+<html lang="ko" data-build="20261108030922">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
@@ -46,7 +46,7 @@ html.m #device{left:0;top:0;width:100%;height:100%;padding:0;border-radius:0;bac
 html.m #bezel{padding:0;border-radius:0}
 html.m #screen{width:100%;height:100%;border-radius:0}
 html.m .hw,html.m #hint,html.m #island,html.m #statusbar,html.m .homebar{display:none}
-html.m{--top:env(safe-area-inset-top,0px);--bot:env(safe-area-inset-bottom,10px)}
+html.m{--top:env(safe-area-inset-top,0px);--bot:max(env(safe-area-inset-bottom,0px),20px)}
 html.m #screen{background:#fff}
 
 .wall{position:absolute;inset:0;z-index:0;background:
@@ -71,7 +71,6 @@ html.m #screen{background:#fff}
 #lock{z-index:20;display:flex;align-items:center;color:#fff;transition:transform .45s cubic-bezier(.3,.75,.2,1);touch-action:none}
 #lock .wall{z-index:-1}
 #lock.up{transform:translateY(-104%)}
-#lock.up.down{transform:translateY(104%)}
 #lock.drag{transition:none}
 .lk-icon{margin-top:calc(var(--top) + 22px);opacity:.95}
 .lk-date{margin-top:8px;font-size:22px;font-weight:500;letter-spacing:-.3px;text-shadow:0 1px 10px rgba(0,0,0,.18)}
@@ -253,6 +252,37 @@ html.m #screen{background:#fff}
 .pill{display:inline-block;background:#fff3b0;color:#6b5c00;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;vertical-align:middle}
 .pill.g{background:#e3f6e7;color:#1d6b2f}.pill.r{background:#ffe3e0;color:#9b1c12}
 #settings{background:var(--ios-bg)}
+/* ---------- 메모 (iOS) ---------- */
+.nt{background:#fff}
+.nt-hdr{background:#fff;padding-left:4px;padding-right:6px}
+.hdr .nt-back{display:flex;align-items:center;gap:0;color:#e8b400;font-size:17px;width:auto;padding-right:6px;white-space:nowrap}
+.nt-ic{width:40px;height:44px;display:grid;place-items:center}
+.nt-title{padding:4px 20px 8px;font-size:34px;font-weight:700;letter-spacing:-.6px}
+.nt-search{margin:0 16px 14px;height:36px;border-radius:10px;background:#eeeef0;display:flex;align-items:center;gap:6px;padding:0 10px;color:#8e8e93;font-size:16px}
+.nt-sect{padding:8px 20px 6px;font-size:20px;font-weight:700;letter-spacing:-.4px}
+.nt-group{margin:0 16px 18px;background:#f4f4f6;border-radius:12px;overflow:hidden}
+.nt-row{display:block;width:100%;text-align:left;padding:12px 16px;border-bottom:.5px solid #dcdce0}
+.nt-row:last-child{border-bottom:0}
+.nt-row b{display:block;font-size:17px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nt-row span{display:block;font-size:15px;color:#8e8e93;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nt-row span em{font-style:normal;color:#000;margin-right:8px}
+.nt-bar{flex:none;height:calc(var(--bot) + 50px);padding:4px 10px 0;display:flex;align-items:center;justify-content:space-between;border-top:.5px solid #dcdce0;background:#f9f9f9;font-size:11.5px;color:#333}
+.nt-tools{justify-content:space-around}
+.nt-doc{padding:14px 20px 40px;-webkit-user-select:text;user-select:text}
+.nt-doc .d{text-align:center;font-size:12px;color:#8e8e93;margin-bottom:10px}
+.nt-doc h1{font-size:28px;font-weight:700;margin:0 0 12px;letter-spacing:-.5px;line-height:1.25}
+.nt-doc h2{font-size:21px;font-weight:700;margin:22px 0 8px;letter-spacing:-.3px}
+.nt-doc p{font-size:17px;line-height:1.5;margin:0 0 10px;letter-spacing:-.2px}
+.nt-doc ol,.nt-doc ul{font-size:17px;line-height:1.5;padding-left:24px;margin:0 0 10px}
+.nt-doc li{margin-bottom:4px}
+.nt-doc .chk{list-style:none;padding-left:0}.nt-doc .chk li{display:flex;gap:10px;align-items:flex-start}.nt-doc .chk li::before{content:"";width:20px;height:20px;border-radius:50%;border:1.5px solid #c7c7cc;flex:none;margin-top:3px}
+.nt-doc b{font-weight:700}
+/* 홈 버튼(하단 막대) */
+#homebtn{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:200px;height:26px;z-index:58;display:none;align-items:flex-end;justify-content:center;padding-bottom:8px}
+#homebtn.on{display:flex}
+#homebtn i{display:block;width:140px;height:5px;border-radius:3px;background:#000;opacity:.85}
+#homebtn.light i{background:#fff}
+html.m #homebtn{bottom:env(safe-area-inset-bottom,0px)}
 #settings .hdr{background:var(--ios-bg)}
 
 /* 시트 */
@@ -342,6 +372,18 @@ html.m #screen{background:#fff}
       <div class="scroll" id="st-body"></div>
     </div>
 
+    <!-- 메모 (iOS 메모 앱) -->
+    <div id="notes" class="layer appv nt">
+      <div class="hdr nt-hdr"><button class="nt-back" id="nt-folders"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e8b400" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span>폴더</span></button><div class="ttl"></div><button class="nt-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e8b400" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="8" cy="12" r="1.2" fill="#e8b400"/><circle cx="12" cy="12" r="1.2" fill="#e8b400"/><circle cx="16" cy="12" r="1.2" fill="#e8b400"/></svg></button></div>
+      <div class="scroll" id="nt-list"></div>
+      <div class="nt-bar"><span></span><span id="nt-count"></span><button class="nt-ic" id="nt-new"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e8b400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"/></svg></button></div>
+    </div>
+    <div id="note" class="layer appv nt">
+      <div class="hdr nt-hdr"><button class="nt-back" id="nt-back"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e8b400" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span>메모</span></button><div class="ttl"></div><button class="nt-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e8b400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4M5 12v8h14v-8"/></svg></button><button class="nt-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e8b400" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="8" cy="12" r="1.2" fill="#e8b400"/><circle cx="12" cy="12" r="1.2" fill="#e8b400"/><circle cx="16" cy="12" r="1.2" fill="#e8b400"/></svg></button></div>
+      <div class="scroll" id="nt-body"></div>
+      <div class="nt-bar nt-tools"><button class="nt-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e8b400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h12M9 12h12M9 18h12M3 6l1.5 1.5L7 5M3 12l1.5 1.5L7 11M3 18l1.5 1.5L7 17"/></svg></button><button class="nt-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e8b400" stroke-width="2"><path d="M9 3 7.2 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.2L15 3z"/><circle cx="12" cy="13" r="4"/></svg></button><button class="nt-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e8b400" stroke-width="2" stroke-linecap="round"><path d="M4 20l4-1L19 8a2 2 0 0 0-3-3L5 16z"/></svg></button><button class="nt-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e8b400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"/></svg></button></div>
+    </div>
+    <button id="homebtn" title="홈으로"><i></i></button>
     <div class="sheet-bg" id="sheet-bg"><div class="sheet"><div class="grab"></div><div id="sheet-in"></div></div></div>
     <div class="alert-bg" id="alert-bg"><div class="alert" id="alert"></div></div>
     <div id="banner"><div class="ic" id="bn-ic"></div><div><b id="bn-t">카카오톡</b><span id="bn-s"></span></div><em>지금</em></div>
@@ -350,7 +392,7 @@ html.m #screen{background:#fff}
     <input type="file" id="jsonfile" accept=".json,application/json" hidden>
   </div></div>
 </div>
-<p id="hint">잠금화면을 아래로 끌어 해제 → 카카오톡 → 채팅 맨 위 내 이름 = 장문 아카이브</p>
+<p id="hint">잠금화면을 위로 끌어 올려 해제 → 메모에 사용법 · 카카오톡에 장문 아카이브</p>
 </div>
 <pre id="selftest"></pre>
 <script>
@@ -523,18 +565,19 @@ function calIcon(){const n=new Date();return ICON.calendar.replace('DAYNAME',['�
 $('#lk-ntf-ic').innerHTML=`<img src="${IMG.talk}" style="width:38px;height:38px;display:block">`;$('#bn-ic').innerHTML=`<img src="${IMG.talk}" style="width:38px;height:38px;display:block">`;
 
 /* ============ 5. 화면 전환 / 잠금 ============ */
-const LAYERS=['home','talk','room','settings'];
-function show(id){LAYERS.forEach(l=>$('#'+l).classList.toggle('on',l===id));$('#screen').dataset.bar=(id==='home')?'light':'dark'}
+const LAYERS=['home','talk','room','settings','notes','note'];
+function show(id){LAYERS.forEach(l=>$('#'+l).classList.toggle('on',l===id));$('#screen').dataset.bar=(id==='home')?'light':'dark';const hb=$('#homebtn');hb.classList.add('on');hb.classList.toggle('light',id==='home')}
+$('#homebtn').onclick=()=>{closeSheet();$('#alert-bg').classList.remove('on');show('home')};
 const lock=$('#lock');let ly=null;
 lock.addEventListener('pointerdown',e=>{if(e.target.closest('.ntf,.lk-tools'))return;ly=e.clientY;lock.classList.add('drag');try{lock.setPointerCapture(e.pointerId)}catch(x){}});
-lock.addEventListener('pointermove',e=>{if(ly===null)return;const dy=e.clientY-ly;lock.style.transform=`translateY(${dy}px)`});
-lock.addEventListener('pointerup',e=>{if(ly===null)return;const dy=e.clientY-ly;ly=null;lock.classList.remove('drag');lock.style.transform='';if(dy>80){lock.classList.add('down');tryUnlock()}else if(dy<-80){lock.classList.remove('down');tryUnlock()}});
+lock.addEventListener('pointermove',e=>{if(ly===null)return;const dy=Math.min(0,e.clientY-ly);lock.style.transform=`translateY(${dy}px)`});
+lock.addEventListener('pointerup',e=>{if(ly===null)return;const dy=e.clientY-ly;ly=null;lock.classList.remove('drag');lock.style.transform='';if(dy<-80)tryUnlock()});
 lock.addEventListener('pointercancel',()=>{ly=null;lock.classList.remove('drag');lock.style.transform=''});
-$('#lk-ntf-btn').onclick=()=>toast('화면을 아래로 쓸어내려 잠금을 해제하세요');
+$('#lk-ntf-btn').onclick=()=>toast('화면을 위로 쓸어 올려 잠금을 해제하세요');
 let afterUnlock='home',NEED_PASS=false,padMode='local';
 function tryUnlock(to){afterUnlock='home';if(NEED_PASS){padOpen('archive')}else if(S.pass){padOpen('local')}else unlock()}
 function unlock(){lock.classList.add('up');$('#pad').classList.remove('on');show('home');if(afterUnlock==='talk'){openTalk('chats');if(S.msgs.length)openRoom()}}
-function relock(){lock.classList.remove('up');$('#pad').classList.remove('on');LAYERS.forEach(l=>$('#'+l).classList.remove('on'));$('#screen').dataset.bar='light';closeSheet()}
+function relock(){lock.classList.remove('up');$('#pad').classList.remove('on');LAYERS.forEach(l=>$('#'+l).classList.remove('on'));$('#screen').dataset.bar='light';$('#homebtn').classList.remove('on');closeSheet()}
 $('#pwbtn').onclick=relock;
 let padBuf='',padBusy=false;
 (function(){const k=$('#keys');const lab={2:'ABC',3:'DEF',4:'GHI',5:'JKL',6:'MNO',7:'PQRS',8:'TUV',9:'WXYZ'};[1,2,3,4,5,6,7,8,9,'',0,'⌫'].forEach(n=>{const b=document.createElement('button');if(n==='')b.style.visibility='hidden';b.innerHTML=n==='⌫'?'<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 5H9l-6 7 6 7h12V5zM12 9l6 6M18 9l-6 6"/></svg>':n+(lab[n]?`<small>${lab[n]}</small>`:'');b.onclick=()=>padKey(n);k.appendChild(b)})})();
@@ -555,9 +598,9 @@ $('#pad-alt').onclick=()=>{const p=$('#pad');p.classList.toggle('text');$('#pad-
 $('#pad-text').onkeydown=e=>{if(e.key==='Enter'&&$('#pad-text').value)padSubmit($('#pad-text').value)};
 
 /* ============ 6. 홈 ============ */
-const APPS=[['전화','phone'],['메시지','msg'],['Safari','safari'],['사진','photos'],['카메라','camera'],['메모','notes'],['캘린더','calendar'],['시계','clock'],['날씨','weather'],['지도','maps'],['음악','music'],['계산기','calc'],['App Store','appstore'],['지갑','wallet'],['Mail','mail'],['YouTube','youtube'],['Instagram','insta'],['설정','settings','settings'],['카카오톡','talk','talk']];
+const APPS=[['전화','phone'],['메시지','msg'],['Safari','safari'],['사진','photos'],['카메라','camera'],['캘린더','calendar'],['시계','clock'],['날씨','weather'],['지도','maps'],['음악','music'],['계산기','calc'],['App Store','appstore'],['지갑','wallet'],['Mail','mail'],['YouTube','youtube'],['Instagram','insta'],['설정','settings','settings'],['카카오톡','talk','talk'],['메모','notes','notes']];
 function appEl(a,inDock){const [name,ic,act]=a;const el=document.createElement('button');el.className='app';const svg=ic==='calendar'?calIcon():IMG[ic]?`<img src="${IMG[ic]}" alt="" draggable="false">`:ICON[ic];el.innerHTML=`<div class="ic">${svg}${ic==='talk'&&!inDock?'<span class="badge" id="talk-badge" style="display:none"></span>':''}</div><span>${name}</span>`;
-  el.onclick=()=>{if(act==='talk'){openTalk('chats')}else if(act==='settings')openSettings();else toast(`${name}은(는) 꾸밈용이에요`)};return el}
+  el.onclick=()=>{if(act==='talk'){openTalk('chats')}else if(act==='settings')openSettings();else if(act==='notes')openNotes();else toast(`${name}은(는) 꾸밈용이에요`)};return el}
 APPS.forEach(a=>$('#apps').appendChild(appEl(a)));
 [['전화','phone'],['Safari','safari'],['메시지','msg'],['카카오톡','talk','talk']].forEach(a=>$('#dock').appendChild(appEl(a,true)));
 function tickClock(){const n=new Date();document.querySelectorAll('#ck-h').forEach(e=>e.setAttribute('transform',`rotate(${(n.getHours()%12)*30+n.getMinutes()*.5} 30 30)`));document.querySelectorAll('#ck-m').forEach(e=>e.setAttribute('transform',`rotate(${n.getMinutes()*6} 30 30)`));document.querySelectorAll('#ck-s').forEach(e=>e.setAttribute('transform',`rotate(${n.getSeconds()*6} 30 30)`))}
@@ -592,7 +635,7 @@ function openTalk(tab){tkTab=tab;show('talk');document.querySelectorAll('#tkbar 
   const me=S.me||'나';const n=S.msgs.length;const last=n?S.msgs[n-1]:null;const body=$('#tk-body');
   if(tab==='chats'){topBar('채팅',[['search','','검색'],['newchat','import','대화 가져오기'],['gear','settings','설정']]);
     body.innerHTML=`<button class="row" id="rm-open">${avatar(true)}<div class="tx"><b>${esc(me)}</b><span>${last?esc(last.x.replace(/\s+/g,' ').slice(0,70)):'보관된 장문이 여기에 쌓여요'}</span></div><div class="meta"><span>${last?fmtShort(last.d):''}</span>${n?`<i>${n>300?'300+':n}</i>`:''}</div></button>`
-      +FAKE_ROOMS.map(r=>`<button class="row dim">${avatar(false)}<div class="tx"><b>${esc(r[0])}${r[1]?`<small>${r[1]}</small>`:''}</b><span>${esc(r[2])}</span></div><div class="meta"><span>어제</span>${r[3]?`<i>${r[3]}</i>`:''}</div></button>`).join('');
+      ;
     $('#rm-open').onclick=openRoom;body.querySelectorAll('.row.dim').forEach(b=>b.onclick=()=>toast('꾸밈용 채팅방이에요. 맨 위 내 이름을 눌러 주세요'));}
   else if(tab==='friends'){topBar(`${avatar(true)}<span>${esc(me)}</span>`,[['search'],['addp'],['gift'],['gear','settings','설정']]);$('#tk-top h1 .av').classList.remove('me');$('#tk-top h1').style.cursor='pointer';$('#tk-top h1').onclick=openRoom;
     body.innerHTML=`<div class="pills"><button class="on">친구</button><button>소식</button></div>
@@ -696,6 +739,30 @@ function openJump(){const days={};S.msgs.forEach(m=>{days[m.d]=(days[m.d]||0)+1}
     $('#sheet-in').querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{JM=b.dataset.m;render()});
     $('#sheet-in').querySelectorAll('.dg button').forEach(b=>b.onclick=()=>{closeSheet();if(starOnly||q){q='';$('#q').value='';setStarOnly(false)}const el=document.querySelector(`#msgs .day[data-d="${b.dataset.k}"]`);if(el){const sc=$('#rm-scroll');sc.scrollTo({top:el.offsetTop-6,behavior:'smooth'})}})};
   render()}
+
+/* ============ 8b. 메모 ============ */
+const NOTES=[
+ {t:'📱 이 아이폰 사용법',d:'2025-11-08',h:`<h2>이게 뭐예요?</h2><p>카카오톡에서 쓴 <b>장문 메시지만</b> 모아 두는 아카이브예요. 아이폰 화면처럼 생겼지만 웹페이지예요.</p>
+<h2>보는 법</h2><ol><li>잠금화면을 <b>위로 쓸어 올리면</b> 홈이 나와요.</li><li>홈에서 <b>카카오톡</b> → 채팅 맨 위 <b>내 이름</b>을 누르면 장문이 날짜순으로 쌓여 있어요.</li><li>오래된 글은 위로 스크롤, 날짜 알약을 누르면 <b>달력</b>으로 바로 이동해요.</li><li>오른쪽 위 🔍로 검색, ♥로 하트한 글만 보기.</li></ol>
+<h2>하트 · 복사</h2><ul><li>말풍선을 <b>두 번 두드리면</b> 하트가 붙어요. 다시 두 번 두드리면 사라져요.</li><li>말풍선을 <b>길게 누르면</b> 복사 메뉴가 나와요.</li><li>하트는 내 기기에만 저장돼서 상대와 섞이지 않아요.</li></ul>
+<h2>화면 이동</h2><ul><li>어느 화면에서든 <b>맨 아래 막대</b>를 누르면 홈으로 돌아와요.</li><li>이 설명은 홈의 <b>메모</b> 앱에 있어요.</li></ul>
+<h2>처음 열었을 때</h2><p>"아카이브 암호"를 물으면 링크를 보낸 사람에게 받은 암호를 숫자 패드로 넣고 <b>확인</b>. 글자 암호면 왼쪽 아래 <b>문자 암호</b>. 한 번 맞추면 기억돼요.</p>
+<h2>새 글</h2><p>상대가 올린 글은 2분 안에 자동으로 와요. 바로 확인하려면 카카오톡 → 더보기 → <b>지금 새로 받기</b>.</p>
+<h2>홈 화면에 추가</h2><p>Safari 공유 버튼 → <b>홈 화면에 추가</b>를 하면 앱처럼 열려요. 새 버전은 앱을 앞으로 가져올 때 자동으로 적용돼요.</p>`},
+ {t:'✍️ 장문 올리는 법 (올리는 사람)',d:'2025-11-08',h:`<h2>한 개 올리기</h2><ol><li>카카오톡에서 내가 쓴 장문을 길게 눌러 <b>복사</b>.</li><li>이 아카이브 → 카카오톡 → 내 이름 → 아래 입력창에 <b>붙여넣기</b> → 노란 <b>↑</b>.</li><li>원래 보낸 날짜·시각을 맞추고 <b>보관</b>.</li></ol>
+<h2>한꺼번에 올리기</h2><ol><li>카톡 채팅방 → ≡ → 톱니 → <b>대화 내용 내보내기</b> → 텍스트만 → 파일에 저장.</li><li>입력창 왼쪽 <b>+</b> → 파일 고르기 → 내 이름 고르기 → 가져오기.</li><li>이미 있는 글은 자동으로 빠져요.</li></ol>
+<h2>지우기 · 고치기</h2><ul><li>말풍선 길게 누르기 → <b>삭제</b>. 상대 화면에서도 사라져요.</li><li>고치려면 지우고 다시 올리면 돼요.</li></ul>
+<h2>다른 기기에서도 올리려면</h2><p>그 기기에서 링크를 열고 카카오톡 → 더보기 → <b>공유 링크</b> → 토큰·암호 입력 → <b>이 기기 설정 저장</b>. 입력창이 보이면 올릴 수 있는 상태예요.</p>
+<h2>주의</h2><ul class="chk"><li>토큰은 아무에게도 주지 마세요. 읽는 사람에게는 <b>링크와 암호만</b>.</li><li>토큰이 만료되면 올릴 때 오류가 떠요. 새 토큰을 만들어 공유 링크 화면에 넣으면 글은 그대로예요.</li></ul>`}
+];
+function fmtNoteDate(d){const [y,m,dd]=d.split('-').map(Number);return `${y}년 ${m}월 ${dd}일`}
+function openNotes(){show('notes');$('#nt-list').innerHTML=`<div class="nt-title">메모</div><div class="nt-search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8e8e93" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>검색</div>
+  <div class="nt-sect">고정됨</div><div class="nt-group">${NOTES.map((n,i)=>`<button class="nt-row" data-i="${i}"><b>${n.t}</b><span><em>${fmtNoteDate(n.d)}</em>${n.h.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,40)}</span></button>`).join('')}</div>
+  <div class="nt-sect">이전</div><div class="nt-group"><button class="nt-row dim"><b>장보기</b><span><em>10월 3일</em>우유, 계란, 두부, 대파</span></button><button class="nt-row dim"><b>책 추천 받은 것</b><span><em>9월 21일</em>아몬드, 불편한 편의점</span></button><button class="nt-row dim"><b>와이파이</b><span><em>8월 2일</em>집 공유기 비번 바꾼 날</span></button></div>`;
+  $('#nt-count').textContent=`${NOTES.length+3}개의 메모`;
+  $('#nt-list').querySelectorAll('.nt-row[data-i]').forEach(b=>b.onclick=()=>openNote(+b.dataset.i));$('#nt-list').querySelectorAll('.nt-row.dim').forEach(b=>b.onclick=()=>toast('꾸밈용 메모예요'))}
+function openNote(i){const n=NOTES[i];show('note');$('#nt-body').innerHTML=`<div class="nt-doc"><div class="d">${fmtNoteDate(n.d)} 오후 2:30</div><h1>${n.t}</h1>${n.h}</div>`;$('#nt-body').scrollTop=0}
+$('#nt-back').onclick=openNotes;$('#nt-folders').onclick=()=>toast('꾸밈용이에요');$('#nt-new').onclick=()=>toast('꾸밈용이에요');document.querySelectorAll('#note .nt-ic,#notes .nt-hdr .nt-ic').forEach(b=>{if(!b.id)b.onclick=()=>toast('꾸밈용이에요')});
 
 /* ============ 9. 설정 ============ */
 function openSettings(){show('settings');const b=$('#st-body');
