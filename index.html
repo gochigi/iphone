@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko" data-build="20261108030922">
+<html lang="ko" data-build="20261108031149">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
@@ -748,12 +748,7 @@ const NOTES=[
 <h2>화면 이동</h2><ul><li>어느 화면에서든 <b>맨 아래 막대</b>를 누르면 홈으로 돌아와요.</li><li>이 설명은 홈의 <b>메모</b> 앱에 있어요.</li></ul>
 <h2>처음 열었을 때</h2><p>"아카이브 암호"를 물으면 링크를 보낸 사람에게 받은 암호를 숫자 패드로 넣고 <b>확인</b>. 글자 암호면 왼쪽 아래 <b>문자 암호</b>. 한 번 맞추면 기억돼요.</p>
 <h2>새 글</h2><p>상대가 올린 글은 2분 안에 자동으로 와요. 바로 확인하려면 카카오톡 → 더보기 → <b>지금 새로 받기</b>.</p>
-<h2>홈 화면에 추가</h2><p>Safari 공유 버튼 → <b>홈 화면에 추가</b>를 하면 앱처럼 열려요. 새 버전은 앱을 앞으로 가져올 때 자동으로 적용돼요.</p>`},
- {t:'✍️ 장문 올리는 법 (올리는 사람)',d:'2025-11-08',h:`<h2>한 개 올리기</h2><ol><li>카카오톡에서 내가 쓴 장문을 길게 눌러 <b>복사</b>.</li><li>이 아카이브 → 카카오톡 → 내 이름 → 아래 입력창에 <b>붙여넣기</b> → 노란 <b>↑</b>.</li><li>원래 보낸 날짜·시각을 맞추고 <b>보관</b>.</li></ol>
-<h2>한꺼번에 올리기</h2><ol><li>카톡 채팅방 → ≡ → 톱니 → <b>대화 내용 내보내기</b> → 텍스트만 → 파일에 저장.</li><li>입력창 왼쪽 <b>+</b> → 파일 고르기 → 내 이름 고르기 → 가져오기.</li><li>이미 있는 글은 자동으로 빠져요.</li></ol>
-<h2>지우기 · 고치기</h2><ul><li>말풍선 길게 누르기 → <b>삭제</b>. 상대 화면에서도 사라져요.</li><li>고치려면 지우고 다시 올리면 돼요.</li></ul>
-<h2>다른 기기에서도 올리려면</h2><p>그 기기에서 링크를 열고 카카오톡 → 더보기 → <b>공유 링크</b> → 토큰·암호 입력 → <b>이 기기 설정 저장</b>. 입력창이 보이면 올릴 수 있는 상태예요.</p>
-<h2>주의</h2><ul class="chk"><li>토큰은 아무에게도 주지 마세요. 읽는 사람에게는 <b>링크와 암호만</b>.</li><li>토큰이 만료되면 올릴 때 오류가 떠요. 새 토큰을 만들어 공유 링크 화면에 넣으면 글은 그대로예요.</li></ul>`}
+<h2>홈 화면에 추가</h2><p>Safari 공유 버튼 → <b>홈 화면에 추가</b>를 하면 앱처럼 열려요. 새 버전은 앱을 앞으로 가져올 때 자동으로 적용돼요.</p>`}
 ];
 function fmtNoteDate(d){const [y,m,dd]=d.split('-').map(Number);return `${y}년 ${m}월 ${dd}일`}
 function openNotes(){show('notes');$('#nt-list').innerHTML=`<div class="nt-title">메모</div><div class="nt-search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8e8e93" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>검색</div>
