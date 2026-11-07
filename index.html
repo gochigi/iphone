@@ -24,6 +24,9 @@ html,body{height:100%;overscroll-behavior:none}
 body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sys);overflow:hidden;-webkit-tap-highlight-color:transparent}
 button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;padding:0;margin:0}
 input,textarea{font:inherit}
+#screen{color-scheme:light}
+#screen input,#screen textarea{color:#000;color-scheme:light;caret-color:#000}
+#screen input::placeholder,#screen textarea::placeholder{color:#a0a0a5}
 svg{display:block}
 #stage{position:relative;width:100%;height:100%;overflow:hidden}
 #device{position:absolute;left:50%;top:calc(50% - 16px);width:419px;height:878px;padding:3px;border-radius:70px;
