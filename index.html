@@ -335,8 +335,8 @@ function hash(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(
 function msgId(m){return hash(m.d+'|'+m.t+'|'+m.x)}
 function sortMsgs(){S.msgs.sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t))}
 function isDel(id){return ((S.del||{})[id]||0)>((S.rev||{})[id]||0)}
-function mergeMsgs(list,revive){if(!S.del)S.del={};if(!S.rev)S.rev={};const have=new Set(S.msgs.map(msgId));let add=0;(list||[]).forEach(m=>{if(!m||!m.x||!m.d)return;const o={d:m.d,t:m.t||'00:00',x:m.x,r:m.r||''};const id=msgId(o);if(isDel(id)){if(revive)S.rev[id]=Date.now();else return}if(!have.has(id)){have.add(id);S.msgs.push(o);add++}});sortMsgs();return add}
-function removeMsgs(list){if(!S.del)S.del={};const ids=new Set(list.map(msgId));ids.forEach(id=>S.del[id]=Date.now());S.msgs=S.msgs.filter(m=>!ids.has(msgId(m)))}
+function mergeMsgs(list,revive){if(!S.del)S.del={};if(!S.rev)S.rev={};const have=new Set(S.msgs.map(msgId));let add=0;(list||[]).forEach(m=>{if(!m||!m.x||!m.d)return;const o={d:m.d,t:m.t||'00:00',x:m.x,r:m.r||''};const id=msgId(o);if(isDel(id)){if(revive)S.rev[id]=Math.max(Date.now(),(S.del[id]||0)+1);else return}if(!have.has(id)){have.add(id);S.msgs.push(o);add++}});sortMsgs();return add}
+function removeMsgs(list){if(!S.del)S.del={};const ids=new Set(list.map(msgId));ids.forEach(id=>S.del[id]=Math.max(Date.now(),((S.rev||{})[id]||0)+1));S.msgs=S.msgs.filter(m=>!ids.has(msgId(m)))}
 function mergeMarks(remote){if(!S.del)S.del={};if(!S.rev)S.rev={};['del','rev'].forEach(k=>{const r=remote[k]||{};for(const id in r){if(!S[k][id]||r[id]>S[k][id])S[k][id]=r[id]}});S.msgs=S.msgs.filter(m=>!isDel(msgId(m)))}
 
 /* ============ 1. 카카오톡 내보내기 파서 ============ */
@@ -723,7 +723,7 @@ if(location.hash==='#selftest'){(async()=>{
   let code='';try{await decode(enc,'wrong')}catch(e){code=e.code}ok('decode badpass',code==='BADPASS');
   code='';try{await decode(enc,'')}catch(e){code=e.code}ok('decode needpass',code==='NEEDPASS');
   ok('shareLink',shareLink().includes('#g='));
-  S.msgs=[];S.del={};mergeMsgs([{d:'2024-01-01',t:'10:00',x:'z1'},{d:'2024-01-02',t:'10:00',x:'z2'}]);removeMsgs([S.msgs[0]]);const back=mergeMsgs([{d:'2024-01-01',t:'10:00',x:'z1'}]);ok('tombstone blocks remerge',back===0&&S.msgs.length===1&&Object.keys(S.del).length===1);const rev=mergeMsgs([{d:'2024-01-01',t:'10:00',x:'z1'}],true);ok('revive on manual add',rev===1&&S.msgs.length===2&&Object.keys(S.del).length===0);ok('payload has del','del' in payload()&&'rev' in payload());
+  S.msgs=[];S.del={};mergeMsgs([{d:'2024-01-01',t:'10:00',x:'z1'},{d:'2024-01-02',t:'10:00',x:'z2'}]);removeMsgs([S.msgs[0]]);const back=mergeMsgs([{d:'2024-01-01',t:'10:00',x:'z1'}]);ok('tombstone blocks remerge',back===0&&S.msgs.length===1&&Object.keys(S.del).length===1);const rev=mergeMsgs([{d:'2024-01-01',t:'10:00',x:'z1'}],true);ok('revive on manual add',rev===1&&S.msgs.length===2&&!isDel(msgId({d:'2024-01-01',t:'10:00',x:'z1'})));ok('payload has del','del' in payload()&&'rev' in payload());
   S.msgs=[];S.del={};S.rev={};mergeMsgs([{d:'2024-01-01',t:'10:00',x:'z1'}]);removeMsgs([S.msgs[0]]);const remoteDel=JSON.parse(JSON.stringify(S.del));await new Promise(r=>setTimeout(r,5));mergeMsgs([{d:'2024-01-01',t:'10:00',x:'z1'}],true);mergeMarks({del:remoteDel,rev:{}});ok('revive beats older remote tombstone',S.msgs.length===1);mergeMarks({del:{[msgId({d:'2024-01-01',t:'10:00',x:'z1'})]:Date.now()+1000},rev:{}});ok('newer remote delete wins',S.msgs.length===0);S.del={};S.rev={};
   r=parseKakao('[나] [13:05] 24시간제\n');ok('pc 24h',r.msgs.length===1&&r.msgs[0].t==='13:05');r=parseKakao('2025. 1. 1. 23:59, 나: 콜론붙음\n');ok('ios 24h colon',r.msgs.length===1&&r.msgs[0].s==='나'&&r.msgs[0].t==='23:59');
   S.msgs=[];$('#selftest').textContent=T.join('\n');$('#selftest').style.display='block';document.title='SELFTEST '+(T.every(t=>t.startsWith('PASS'))?'ALL PASS':'FAIL')})()}
